@@ -1,0 +1,55 @@
+import * as hz from "horizon/core";
+
+class Score extends (hz.Component as any) {
+
+  static propsDefinition = {
+    playerScore: { default: 0 },
+    pointsPerStep: { default: 10 },
+    scoreDisplay: { default: null }, 
+  };
+
+  props: any;
+
+  constructor(...args: any[]) {
+    super(...args);
+  }
+
+  start() {
+    if (typeof this.props.playerScore !== "number") this.props.playerScore = 0;
+    if (typeof this.props.pointsPerStep !== "number") this.props.pointsPerStep = 10;
+
+    this.updateDisplay();
+  }
+
+  onPlayerEnter(player: any) {
+    const pts = Number(this.props.pointsPerStep) || 10;
+    this.props.playerScore = (Number(this.props.playerScore) || 0) + pts;
+    this.updateDisplay();
+  }
+
+  updateDisplay() {
+    const scr = this.props.scoreDisplay;
+    const texto = `Energía Cuántica: ${this.props.playerScore}`;
+
+    if (!scr) {
+      console.warn("[Score] scoreDisplay no asignado. Texto:", texto);
+      return;
+    }
+
+    try {
+      if ("text" in scr) {
+        (scr as any).text = texto;
+      } else if (typeof (scr as any).setText === "function") {
+        (scr as any).setText(texto);
+      } else {
+        (scr as any).value = texto;
+      }
+    } catch (e) {
+      console.warn("[Score] No se pudo actualizar el texto:", e);
+    }
+  }
+}
+
+hz.Component.register(Score as any);
+
+export default Score;
