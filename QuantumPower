@@ -1,0 +1,78 @@
+import * as hz from "horizon/core";
+
+class QuantumPower extends (hz.Component as any) {
+  static propsDefinition = {
+    quantumPower: { default: 0 },       
+    pointsPerStep: { default: 1 },      
+    display: { default: null },         
+    baseMultiplier: { default: 1.0 },   
+    growthRate: { default: 0.05 },      
+  };
+
+  props: any;
+
+  constructor(...args: any[]) {
+    super(...args);
+  }
+
+  start() {
+    console.log("[QuantumPower] Iniciado con propiedades:", this.props);
+    this.ensureDefaults();
+    this.updateDisplay();
+  }
+
+  onPlayerEnter(player: any) {
+    this.ensureDefaults();
+    this.props.quantumPower += this.props.pointsPerStep;
+    console.log(`[QuantumPower] Jugador entró. Nuevo poder: ${this.props.quantumPower}`);
+    this.updateDisplay();
+  }
+
+  
+  ensureDefaults() {
+    if (typeof this.props.quantumPower !== "number") this.props.quantumPower = 0;
+    if (typeof this.props.pointsPerStep !== "number") this.props.pointsPerStep = 1;
+    if (typeof this.props.baseMultiplier !== "number") this.props.baseMultiplier = 1.0;
+    if (typeof this.props.growthRate !== "number") this.props.growthRate = 0.05;
+  }
+
+  updateDisplay() {
+    const scr = this.props.display;
+    const texto = `Poder Cuántico: ${this.props.quantumPower}`;
+
+    if (!scr) {
+      console.warn("[QuantumPower] 'display' no está asignado.");
+      return;
+    }
+
+    try {
+      if ("text" in scr) {
+        (scr as any).text = texto;
+        console.log("[QuantumPower] Texto actualizado con .text =", texto);
+      } else if (typeof (scr as any).setText === "function") {
+        (scr as any).setText(texto);
+        console.log("[QuantumPower] Texto actualizado con .setText =", texto);
+      } else {
+        (scr as any).value = texto;
+        console.log("[QuantumPower] Texto actualizado con .value =", texto);
+      }
+    } catch (e) {
+      console.error("[QuantumPower] Error al actualizar el texto:", e);
+    }
+  }
+
+  getMultiplier() {
+    const multiplier = this.props.baseMultiplier + this.props.quantumPower * this.props.growthRate;
+    console.log("[QuantumPower] Multiplicador actual:", multiplier);
+    return multiplier;
+  }
+}
+
+try {
+  hz.Component.register(QuantumPower as any);
+  console.log("[QuantumPower] Componente registrado correctamente.");
+} catch (e) {
+  console.error("[QuantumPower] Error al registrar el componente:", e);
+}
+
+export default QuantumPower;
